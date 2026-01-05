@@ -1,0 +1,5 @@
+google-auth
+google-cloud-kms
+python_pqc_wrapping[gcp]
+cryptography
+liboqs-python
