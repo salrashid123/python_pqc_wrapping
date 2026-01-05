@@ -23,7 +23,7 @@ jobs:
         sudo cmake -S liboqs -B liboqs/build  -DBUILD_SHARED_LIBS=ON 
         sudo cmake --build liboqs/build --parallel 8
         sudo cmake --build liboqs/build --target install
-        sudo pip install logging pytest pytest-cov cryptography pem protobuf asn1tools  google-auth google-cloud-kms liboqs-python protobuf
+        sudo pip install logging pytest pytest-cov cryptography pem protobuf asn1tools  google-auth google-cloud-kms liboqs-python protobuf setuptools
         sudo pytest testing/test_all.py --junitxml=report.xml -p no:warnings
 
     - name: Publish test results
