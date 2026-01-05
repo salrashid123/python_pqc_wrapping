@@ -18,7 +18,7 @@ jobs:
     - name: Test with pytest
 
       run: |
-        sudo apt-get update && sudo apt-get install astyle cmake gcc ninja-build python-setuptools libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind git -y
+        sudo apt-get update && sudo apt-get install astyle cmake gcc ninja-build python3-setuptools libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind git -y
         git clone --depth=1 https://github.com/open-quantum-safe/liboqs
         sudo cmake -S liboqs -B liboqs/build  -DBUILD_SHARED_LIBS=ON 
         sudo cmake --build liboqs/build --parallel 8
