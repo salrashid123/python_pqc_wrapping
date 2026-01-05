@@ -19,7 +19,7 @@ jobs:
 
       run: |
         sudo apt-get update && sudo apt-get install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind git -y
-        git clone git clone --depth=1 https://github.com/open-quantum-safe/liboqs
+        git clone --depth=1 https://github.com/open-quantum-safe/liboqs
         cmake -S liboqs -B liboqs/build  -DBUILD_SHARED_LIBS=ON 
         cmake --build liboqs/build --parallel 8
         cmake --build liboqs/build --target install
