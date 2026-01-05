@@ -38,9 +38,9 @@ cmake --build liboqs/build --parallel 8
 cmake --build liboqs/build --target install
 
 # if you want a different installation directory (eg /apps/liboqs), 
-### add -DCMAKE_INSTALL_PREFIX=/apps/libqs  to the configure command above.
+### add -DCMAKE_INSTALL_PREFIX=/apps/liboqs  to the configure command above.
 ### when running the samples, set the env var  
-### export OQS_INSTALL_PATH=/apps/libqs
+### export OQS_INSTALL_PATH=/apps/liboqs
 ```
 
 also on  
