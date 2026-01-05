@@ -212,10 +212,55 @@ Note that you can specify the client data either in the overall wrapper config o
 
 ### GCP KMS
 
-**TODO** 
+This library also supports encapsulation using [GCP KMS MLKEM](https://docs.cloud.google.com/kms/docs/key-encapsulation-mechanisms) 
 
-This library can also support encapsulation using [GCP KMS MLKEM](https://docs.cloud.google.com/kms/docs/key-encapsulation-mechanisms)
+To use this mode, first create a kms key
 
+```bash
+gcloud kms keyrings create kem_kr --location=global
+
+gcloud kms keys create kem_key_1 \
+    --keyring kem_kr \
+    --location global \
+    --purpose "key-encapsulation" \
+    --default-algorithm ml-kem-768 \
+    --protection-level "software"
+
+
+gcloud kms keys versions get-public-key 1 \
+    --key kem_key_1 \
+    --keyring kem_kr \
+    --location global  \
+    --output-file /tmp/kem_pub.nist \
+    --public-key-format nist-pqc
+```
+
+The extract the public key into PEM format:
+
+```bash
+$ openssl --version
+  OpenSSL 3.5.0-dev  (Library: OpenSSL 3.5.0-dev )
+
+$ { echo -n "MIIEsjALBglghkgBZQMEBAIDggShAA==" | base64 -d ; cat /tmp/kem_pub.nist; } | openssl asn1parse -inform DER -in -
+    0:d=0  hl=4 l=1202 cons: SEQUENCE          
+    4:d=1  hl=2 l=  11 cons: SEQUENCE          
+    6:d=2  hl=2 l=   9 prim: OBJECT            :ML-KEM-768
+   17:d=1  hl=4 l=1185 prim: BIT STRING        
+
+$ cd example/
+$ { echo -n "MIIEsjALBglghkgBZQMEBAIDggShAA==" | base64 -d ; cat /tmp/kem_pub.nist; } \
+   | openssl pkey -inform DER -pubin -pubout -out certs/pub-ml-kem-768-kms.pem
+```
+
+then if your environment is authorized to access the key (eg, `GOOGLE_APPLICATION_CREDENTIALS` service account below has access to the key above).
+
+The uri you will specify to decrypt is set with the kms uri prefixed with `gcpkms://`.  For example
+
+```python
+private_key_file_path= 'gcpkms://projects/core-eso/locations/global/keyRings/kem_kr/cryptoKeys/kem_key_1/cryptoKeyVersions/1'
+
+bd = BaseWrapper(privateKey=private_key_file_path, clientData=client_data, decrypt=True)
+```
 
 ### Wrapped Key format
 

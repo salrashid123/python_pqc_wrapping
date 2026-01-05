@@ -4,7 +4,10 @@ from python_pqc_wrapping.pqcwrappb.blobwrap_pb2 import BlobInfo, KeyInfo
 from google.protobuf.struct_pb2 import Struct
 from python_pqc_wrapping.common import PEMUtility, mlkem_768_oidstring,mlkem_1024_oidstring
 from google.protobuf import json_format
+from google.cloud import kms
+from google.cloud.kms_v1 import types
 
+import re
 import os
 import oqs
 import json
@@ -29,11 +32,34 @@ class BaseWrapper():
         self._clientData = clientData
         self._decrypt = decrypt
         self._keyName = keyName
+        self._gcpkms = None
+        self._public = None
+        self._private = None
 
         p = PEMUtility()
         if decrypt:
-           self._private_alg, self._private = p.get_private_key(privateKey)            
+           if privateKey == None:
+               raise Exception("PrivateKey cannot be null for decryption")
+           
+           if privateKey.startswith("gcpkms://"):
+            
+                kms_uri = privateKey.removeprefix("gcpkms://")
+                pattern = re.compile(
+                    r"^projects/(?P<project_id>[^/]+)/"
+                    r"locations/(?P<location>[^/]+)/"
+                    r"keyRings/(?P<key_ring>[^/]+)/"
+                    r"cryptoKeys/(?P<key_name>[^/]+)"
+                    r"(?:/cryptoKeyVersions/(?P<key_version>[^/]+))?$"
+                )
+                match = pattern.match(kms_uri)
+                if not match:
+                    raise Exception(f"Error: Invalid KMS URI format: {kms_uri}")
+                self._gcpkms = kms_uri
+           else:
+            self._private_alg, self._private = p.get_private_key(privateKey)            
         else:
+           if publicKey == None:
+               raise Exception("publicKey cannot be null for decryption")           
            self._public_alg, self._public = p.get_public_key(publicKey)
 
     def encrypt(self, plaintext, aad=None, clientData=None) -> str:
@@ -81,37 +107,44 @@ class BaseWrapper():
             return json_format.MessageToJson(blobpb)
     
     def decrypt(self, blob_info, aad=None, clintData=None) -> str:
-        if self._private is None:
-            raise Exception("BaseWrapper must be initialized with a private key for decryption")
+        if self._private is None and self._gcpkms is None:
+            raise Exception("BaseWrapper must be initialized with a private key or KMSKey for decryption")
         if blob_info is None:
             raise Exception("BaseWrapper must be initialized with a blobInfo")
         
-        if self._private_alg == mlkem_768_oidstring:
-            kemalg = "ML-KEM-768"
-            secret_type = Secret.ml_kem_768
-        elif self._private_alg== mlkem_1024_oidstring:
-            kemalg = "ML-KEM-1024"
-            secret_type = Secret.ml_kem_1024
-        else:
-            raise Exception("unsupported private key algorithm [{}] got must be one of [{}] [{}]".format(self._private_alg, mlkem_768_oidstring, mlkem_1024_oidstring))
-
         blob_info_message = BlobInfo()
         bi = Parse(blob_info, blob_info_message)
         ivAndcipherText = bi.ciphertext
 
         secret_message = Secret()
-        ki = Parse(bi.key_info.wrapped_key, secret_message)
+        ki = Parse(bi.key_info.wrapped_key, secret_message)        
 
-        if ki.type != secret_type:
-            raise Exception("Secret type provided in the key {} does not match private key type {}",ki.type, secret_type)
+        if not self._gcpkms:
+            if self._private_alg == mlkem_768_oidstring:
+                kemalg = "ML-KEM-768"
+                secret_type = Secret.ml_kem_768
+            elif self._private_alg== mlkem_1024_oidstring:
+                kemalg = "ML-KEM-1024"
+                secret_type = Secret.ml_kem_1024
+            else:
+                raise Exception("unsupported private key algorithm [{}] got must be one of [{}] [{}]".format(self._private_alg, mlkem_768_oidstring, mlkem_1024_oidstring))
+            if ki.type != secret_type:
+                raise Exception("Secret type provided in the key {} does not match private key type {}",ki.type, secret_type)
         
-        with oqs.KeyEncapsulation(kemalg) as client:
-            _ =  client.generate_keypair_seed(seed=self._private)
-            shared_secret_client = client.decap_secret(ki.kemCipherText)  
+            with oqs.KeyEncapsulation(kemalg) as client:
+                _ =  client.generate_keypair_seed(seed=self._private)
+                shared_secret_client = client.decap_secret(ki.kemCipherText)
+        else:
+            client = kms.KeyManagementServiceClient()
+            resp = client.decapsulate(types.DecapsulateRequest(
+                name = self._gcpkms,
+                ciphertext = ki.kemCipherText
+            ))
+            shared_secret_client = resp.shared_secret
 
-            aesgcm = AESGCM(shared_secret_client)
-            iv = ivAndcipherText[:self.DEFAULT_IV_SIZE]
-            cipherText = ivAndcipherText[self.DEFAULT_IV_SIZE:]
+        aesgcm = AESGCM(shared_secret_client)
+        iv = ivAndcipherText[:self.DEFAULT_IV_SIZE]
+        cipherText = ivAndcipherText[self.DEFAULT_IV_SIZE:]
 
-            return aesgcm.decrypt(iv, cipherText, aad)
+        return aesgcm.decrypt(iv, cipherText, aad)
      

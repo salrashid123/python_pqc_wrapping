@@ -1,6 +1,10 @@
 from python_pqc_wrapping import BaseWrapper
 
 public_key_file_path= 'certs/pub-ml-kem-768-bare-seed.pem'
+
+## for kms:
+#public_key_file_path= 'certs/pub-ml-kem-768-kms.pem'
+
 with open(public_key_file_path, 'r') as f:
     public_key_string = f.read()
 

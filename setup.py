@@ -25,6 +25,7 @@ setuptools.setup(
         'cryptography',
         'protobuf',
         'liboqs-python',
+        'google-cloud-kms'
         # 'liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python.git'
     ],
     extras_require={
