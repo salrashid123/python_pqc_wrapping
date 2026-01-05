@@ -19,12 +19,12 @@ jobs:
 
       run: |
         sudo apt-get update && sudo apt-get install astyle cmake gcc ninja-build python3-setuptools libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind git -y
-        mkdir -p /apps/liboqs
+        sudo mkdir -p /tmp/liboqs
         git clone --depth=1 https://github.com/open-quantum-safe/liboqs
-        sudo cmake -S liboqs -B liboqs/build  -DCMAKE_INSTALL_PREFIX=/apps/liboqs -DBUILD_SHARED_LIBS=ON 
+        sudo cmake -S liboqs -B liboqs/build  -DCMAKE_INSTALL_PREFIX=/tmp/liboqs -DBUILD_SHARED_LIBS=ON 
         sudo cmake --build liboqs/build --parallel 8
         sudo cmake --build liboqs/build --target install
-        export OQS_INSTALL_PATH=/apps/liboqs
+        export OQS_INSTALL_PATH=/tmp/liboqs
         pip install logging pytest pytest-cov cryptography pem protobuf asn1tools  google-auth google-cloud-kms liboqs-python protobuf
         pytest testing/test_all.py --junitxml=report.xml -p no:warnings
 
