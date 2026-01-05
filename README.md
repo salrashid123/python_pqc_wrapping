@@ -4,7 +4,7 @@ This is a simple python library and cli using `ML-KEM` to wrap encrypt/decrypt a
 
 This is basically hybrid encryption where an `ML-KEM` keypair's public key is used to generate a `sharedSecret` which is used as an `AES-GCM` encryption key ultimately used to encrypt the data.
 
-TODO: This library also supports Google Cloud KMS's support for `ML-KEM`
+This library also supports [Google Cloud KMS](https://cloud.google.com/blog/products/identity-security/announcing-quantum-safe-key-encapsulation-mechanisms-in-cloud-kms)  `ML-KEM`
 
 >> NOTE: this library is note supported by Google and is just experimental
 
