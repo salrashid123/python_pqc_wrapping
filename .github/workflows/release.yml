@@ -20,11 +20,11 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind git -y
         git clone --depth=1 https://github.com/open-quantum-safe/liboqs
-        cmake -S liboqs -B liboqs/build  -DBUILD_SHARED_LIBS=ON 
-        cmake --build liboqs/build --parallel 8
-        cmake --build liboqs/build --target install
-        pip install logging pytest pytest-cov cryptography pem protobuf asn1tools  google-auth google-cloud-kms liboqs-python protobuf
-        pytest testing/test_all.py --junitxml=report.xml -p no:warnings
+        sudo cmake -S liboqs -B liboqs/build  -DBUILD_SHARED_LIBS=ON 
+        sudo cmake --build liboqs/build --parallel 8
+        sudo cmake --build liboqs/build --target install
+        sudo pip install logging pytest pytest-cov cryptography pem protobuf asn1tools  google-auth google-cloud-kms liboqs-python protobuf
+        sudo pytest testing/test_all.py --junitxml=report.xml -p no:warnings
 
     - name: Publish test results
       uses: test-summary/action@v2
