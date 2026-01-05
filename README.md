@@ -1,4 +1,3 @@
-
 ## Python AEAD encryption using Post Quantum Cryptography (ML-KEM)
 
 This is a simple python library and cli using `ML-KEM` to wrap encrypt/decrypt arbitrary data.  
@@ -45,8 +44,16 @@ cmake --build liboqs/build --target install
 
 also on  
 
-* [pypi](https://pypi.org/project/python-pqc-wrapping)
-* [python-pqc-wrapping](https://test.pypi.org/project/python-pqc-wrapping)
+* [https://pypi.org/project/python-pqc-wrapping](https://pypi.org/project/python-pqc-wrapping)
+* [https://test.pypi.org/project/python-pqc-wrapping](https://test.pypi.org/project/python-pqc-wrapping)
+
+
+if you alreeady have `liboqs` installed, 
+
+```bash
+export OQS_INSTALL_PATH=/path/to/liboqs
+pip install python-pqc-wrapping
+```
 
 ---
 
