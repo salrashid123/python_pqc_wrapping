@@ -9,7 +9,7 @@ with open(public_key_file_path, 'r') as f:
     public_key_string = f.read()
 
 client_data = '{"foo":"bar"}'
-be = BaseWrapper(publicKey=public_key_string,keyName="mykey", clientData=client_data, decrypt=False)
+be = BaseWrapper(publicKey=public_key_string,keyName="mykey", clientData=client_data)
 
 en = be.encrypt(plaintext="foo".encode('utf-8'), aad="myaad".encode('utf-8'))
 print(en)

@@ -26,23 +26,17 @@ class BaseWrapper():
         publicKey=None,
         privateKey=None,
         clientData=None,
-        keyName=None,
-        decrypt=False
+        keyName=None
     ) ->  Tuple[str,bytes]:
         self._clientData = clientData
-        self._decrypt = decrypt
         self._keyName = keyName
         self._gcpkms = None
         self._public = None
         self._private = None
 
         p = PEMUtility()
-        if decrypt:
-           if privateKey == None:
-               raise Exception("PrivateKey cannot be null for decryption")
-           
+        if privateKey != None:
            if privateKey.startswith("gcpkms://"):
-            
                 kms_uri = privateKey.removeprefix("gcpkms://")
                 pattern = re.compile(
                     r"^projects/(?P<project_id>[^/]+)/"

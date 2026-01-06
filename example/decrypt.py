@@ -8,7 +8,7 @@ with open("/tmp/encrypted.json", 'r') as file:
     encrypted_data = file.read()
 
 client_data = '{"foo":"bar"}'
-bd = BaseWrapper(privateKey=private_key_string, clientData=client_data, decrypt=True)
+bd = BaseWrapper(privateKey=private_key_string, clientData=client_data)
 
 dn = bd.decrypt(blob_info=encrypted_data, aad="myaad".encode('utf-8'))
 print(dn.decode())

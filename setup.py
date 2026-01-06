@@ -12,7 +12,7 @@ with io.open(readme_filename, encoding='utf-8') as readme_file:
 
 setuptools.setup(
     name="python_pqc_wrapping",
-    version="0.0.13",
+    version="0.0.14",
     author="Sal Rashid",
     author_email="salrashid123@gmail.com",
     description="AEAD encryption using Post Quantum Cryptography (ML-KEM)",

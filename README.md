@@ -186,7 +186,7 @@ with open(public_key_file_path, 'r') as f:
     public_key_string = f.read()
 
 client_data = '{"foo":"bar"}'
-be = BaseWrapper(publicKey=public_key_string,keyName="mykey", clientData=client_data, decrypt=False)
+be = BaseWrapper(publicKey=public_key_string,keyName="mykey", clientData=client_data)
 
 en = be.encrypt(plaintext="foo".encode('utf-8'), aad="myaad".encode('utf-8'))
 print(en)
@@ -207,7 +207,7 @@ with open("/tmp/encrypted.json", 'r') as file:
     encrypted_data = file.read()
 
 client_data = '{"foo":"bar"}'
-bd = BaseWrapper(privateKey=private_key_string, clientData=client_data, decrypt=True)
+bd = BaseWrapper(privateKey=private_key_string, clientData=client_data)
 
 dn = bd.decrypt(blob_info=encrypted_data, aad="myaad".encode('utf-8'))
 print(dn)
