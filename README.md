@@ -23,6 +23,33 @@ Also see:
 This library currently use  [liboqs-python](https://github.com/open-quantum-safe/liboqs-python) which itself has a dependency on C and installation of `liboqs.so`.  Eventually, when there's a pure-python implementation of mlkem, i'll use that instead. see [pyca/cryptography/issues/12824](https://github.com/pyca/cryptography/issues/12824).
 
 
+### QuickStart
+
+Using docker image from [example/Dockerfile](example/Dockerfile)
+
+```bash
+docker run -v /dev/urandom:/dev/urandom -ti salrashid123/openssl-liboqs-python
+
+   git clone https://github.com/salrashid123/python_pqc_wrapping.git
+   cd python_pqc_wrapping/example/
+
+   virtualenv env
+   source env/bin/activate
+   pip3 install  python-pqc-wrapping
+
+   # encrypt
+   python3 encrypt.py
+
+   # decrypt   
+   python3 decrypt.py
+
+   ### to print key details
+   openssl pkey -in certs/bare-seed-768.pem -text
+   openssl asn1parse -inform PEM -in certs/bare-seed-768.pem
+
+   openssl asn1parse -inform PEM -in certs/pub-ml-kem-768-bare-seed.pem
+```
+
 ### Setup
 
 First install [liboqs-python](https://github.com/open-quantum-safe/liboqs-python)
