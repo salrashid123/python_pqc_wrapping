@@ -13,13 +13,18 @@ import oqs
 import json
 from typing import Tuple
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.backends import default_backend
+
 from google.protobuf.json_format import Parse
 
 class BaseWrapper():
 
     DEFAULT_IV_SIZE = 12
-    VERSION = 2
+    DEFAULT_KDF_SALT_SIZE = 16
+    VERSION = 3
 
     def __init__(
         self,
@@ -71,14 +76,26 @@ class BaseWrapper():
 
         with oqs.KeyEncapsulation(kemalg) as server:
             # key = AESGCM.generate_key(bit_length=256)
-            ciphertext, shared_secret_server = server.encap_secret(self._public)           
-            aesgcm = AESGCM(shared_secret_server)
+            ciphertext, shared_secret_server = server.encap_secret(self._public)
+
+            # run hkdf
+            salt = os.urandom(self.DEFAULT_IV_SIZE)
+            hkdf = HKDF(
+                algorithm=hashes.SHA256(),
+                length=32,  ## create aes256  32bytes
+                salt=salt,
+                info=aad,
+            )
+            derived_key = hkdf.derive(shared_secret_server)
+
+            aesgcm = AESGCM(derived_key)
             nonce = os.urandom(self.DEFAULT_IV_SIZE)
             ct = nonce + aesgcm.encrypt(nonce, plaintext, aad)
 
             wrappb = Secret(name=self._keyName, 
                             version=self.VERSION,
                             type=secret_type,
+                            kdfSalt=salt,
                             kemCipherText=ciphertext)
                             
             secret_json = json_format.MessageToJson(wrappb, indent=0)
@@ -136,7 +153,16 @@ class BaseWrapper():
             ))
             shared_secret_client = resp.shared_secret
 
-        aesgcm = AESGCM(shared_secret_client)
+        # run hkdf
+        hkdf = HKDF(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=secret_message.kdfSalt,
+            info=aad,
+        )
+        derived_key = hkdf.derive(shared_secret_client)
+
+        aesgcm = AESGCM(derived_key)
         iv = ivAndcipherText[:self.DEFAULT_IV_SIZE]
         cipherText = ivAndcipherText[self.DEFAULT_IV_SIZE:]
 

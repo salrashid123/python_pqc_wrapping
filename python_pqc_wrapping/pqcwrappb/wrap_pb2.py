@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14pqcwrappb/wrap.proto\x12\tpqcwrappb\"\xb6\x01\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\'\n\x04type\x18\x03 \x01(\x0e\x32\x19.pqcwrappb.Secret.KeyType\x12\x15\n\rkemCipherText\x18\x04 \x01(\x0c\x12\x11\n\tpublicKey\x18\x05 \x01(\x0c\":\n\x07KeyType\x12\x0e\n\nml_kem_512\x10\x00\x12\x0e\n\nml_kem_768\x10\x01\x12\x0f\n\x0bml_kem_1024\x10\x02\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14pqcwrappb/wrap.proto\x12\tpqcwrappb\"\xc7\x01\n\x06Secret\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\'\n\x04type\x18\x03 \x01(\x0e\x32\x19.pqcwrappb.Secret.KeyType\x12\x15\n\rkemCipherText\x18\x04 \x01(\x0c\x12\x0f\n\x07kdfSalt\x18\x05 \x01(\x0c\x12\x11\n\tpublicKey\x18\x06 \x01(\x0c\":\n\x07KeyType\x12\x0e\n\nml_kem_512\x10\x00\x12\x0e\n\nml_kem_768\x10\x01\x12\x0f\n\x0bml_kem_1024\x10\x02\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'pqcwrappb.wrap_pb2', globals())
@@ -21,7 +21,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _SECRET._serialized_start=36
-  _SECRET._serialized_end=218
-  _SECRET_KEYTYPE._serialized_start=160
-  _SECRET_KEYTYPE._serialized_end=218
+  _SECRET._serialized_end=235
+  _SECRET_KEYTYPE._serialized_start=177
+  _SECRET_KEYTYPE._serialized_end=235
 # @@protoc_insertion_point(module_scope)
